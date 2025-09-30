@@ -117,46 +117,48 @@ function App() {
       <main className="flex-1 w-full flex overflow-hidden">
         <aside className="flex-shrink-0 w-[250px] bg-gray-900 text-white p-6 border-r border-gray-800 hidden md:flex flex-col">
           <div className="h-full w-full flex flex-col items-center justify-center text-center">
-            <h3 className="text-lg font-bold text-purple-300 mb-4">🎵 Ahora Suena</h3>
+            <h3 className="text-lg font-bold text-purple-300 mb-4">Ahora Suena</h3>
             <div className="w-full max-w-[180px] aspect-square bg-gray-700 rounded-lg shadow-xl mb-4">
               <img src={currentSong?.picture || `https://placehold.co/250x250/1e1b4b/9333ea?text=${currentSong?.album || '...'}`} alt="Carátula" className="w-full h-full object-cover rounded-lg" />
             </div>
             <div className="space-y-1 w-full max-w-[200px]">
-              <p className="text-lg font-extrabold text-white break-words truncate" title={currentSong?.title}>{currentSong?.title || 'Selecciona una canción'}</p>
+              <p className="text-lg font-extrabold text-white break-words" title={currentSong?.title}>{currentSong?.title || 'Selecciona una canción'}</p>
               <p className="text-sm text-gray-400">{currentSong?.artist || '...'}</p>
               <p className="text-xs text-purple-400">{currentSong ? `${currentSong.album} - ${currentSong.year}` : '...'}</p>
             </div>
           </div>
         </aside>
 
-        <section className="flex-1 bg-gray-800 text-white p-4 sm:p-8 overflow-y-auto">
-          <div className="bg-gray-900 rounded-lg shadow-xl overflow-hidden h-full flex flex-col">
-            <div className="grid grid-cols-[2fr_1.5fr_1.5fr_60px_60px_40px] gap-4 p-4 text-xs font-semibold uppercase text-gray-400 border-b border-gray-700 sticky top-0 bg-gray-900 z-10">
-              <div>Título</div>
-              <div className="hidden sm:block">Artista</div>
-              <div className="hidden md:block">Álbum</div>
-              <div className="text-center hidden lg:block">Año</div>
-              <div className="text-right">Duración</div>
-              <div></div>
-            </div>
-            <div className="divide-y divide-gray-800 text-sm overflow-y-auto">
-              {filteredLibrary.length > 0 ? filteredLibrary.map((song) => (
-                <div
-                  key={song.id}
-                  onClick={() => playSongNow(song)}
-                  className={`grid grid-cols-[2fr_1.5fr_1.5fr_60px_60px_40px] gap-4 p-3 sm:p-4 text-gray-300 cursor-pointer transition-colors ${currentSong?.id === song.id ? 'bg-purple-900/40 text-purple-400 font-semibold' : 'hover:bg-gray-700'}`}
-                >
-                  <div className="truncate">{song.title}</div>
-                  <div className="truncate hidden sm:block">{song.artist}</div>
-                  <div className="truncate hidden md:block">{song.album}</div>
-                  <div className="text-center hidden lg:block">{song.year}</div>
-                  <div className="text-right col-span-2">{song.duration}</div>
-                </div>
-              )) : (
-                <div className="p-8 text-center text-gray-500">
-                  {library.length === 0 ? "Usa el icono de carpeta 📂 para cargar tu música." : "No se encontraron resultados."}
-                </div>
-              )}
+        <section className="flex-1 bg-gray-800 text-white p-4 sm:p-8 overflow-hidden relative">
+          <div className="absolute inset-0 p-4 sm:p-8">
+            <div className="bg-gray-900 rounded-lg shadow-xl h-full flex flex-col overflow-hidden">
+              <div className="grid grid-cols-[2fr_1.5fr_1.5fr_60px_60px_40px] gap-4 p-4 text-xs font-semibold uppercase text-gray-400 border-b border-gray-700 flex-shrink-0">
+                <div>Título</div>
+                <div className="hidden sm:block">Artista</div>
+                <div className="hidden md:block">Álbum</div>
+                <div className="text-center hidden lg:block">Año</div>
+                <div className="text-right">Duración</div>
+                <div></div>
+              </div>
+              <div className="divide-y divide-gray-800 text-sm overflow-y-auto">
+                  {filteredLibrary.length > 0 ? filteredLibrary.map((song) => (
+                    <div
+                      key={song.id}
+                      onClick={() => playSongNow(song)}
+                      className={`grid grid-cols-[2fr_1.5fr_1.5fr_60px_60px_40px] gap-4 p-3 sm:p-4 text-gray-300 cursor-pointer transition-colors ${currentSong?.id === song.id ? 'bg-purple-900/40 text-purple-400 font-semibold' : 'hover:bg-gray-700'}`}
+                    >
+                      <div className="truncate">{song.title}</div>
+                      <div className="truncate hidden sm:block">{song.artist}</div>
+                      <div className="truncate hidden md:block">{song.album}</div>
+                      <div className="text-center hidden lg:block">{song.year || ''}</div>
+                      <div className="text-right col-span-2">{song.duration}</div>
+                    </div>
+                  )) : (
+                    <div className="p-8 text-center text-gray-500 flex-1 flex items-center justify-center">
+                      {library.length === 0 ? "Usa el icono de carpeta 📂 para cargar tu música." : "No se encontraron resultados."}
+                    </div>
+                  )}
+              </div>
             </div>
           </div>
         </section>
@@ -206,20 +208,24 @@ function App() {
           <div className="sm:w-1/2 flex items-center gap-3 w-full sm:order-2 order-1 mt-2 sm:mt-0">
             <span className="text-xs text-gray-400 w-10 text-right">{new Date(currentTime * 1000).toISOString().substr(14, 5)}</span>
             <div className="relative flex-1 group">
+              {/* Nueva base gris para la barra de progreso */}
+              <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full h-1 bg-gray-700 rounded-full pointer-events-none group-hover:h-1.5 transition-all duration-200"></div>
+              {/* Barra de progreso morada (sin cambios) */}
+              <div 
+                className="absolute top-1/2 -translate-y-1/2 left-0 h-1 rounded-full bg-purple-500 pointer-events-none group-hover:h-1.5 transition-all duration-200"
+                style={{ width: `${(currentTime / duration) * 100}%` }}
+              ></div>
+              {/* Input de rango ahora es transparente */}
               <input
                   type="range"
                   min="0"
                   max={duration || 0}
                   value={currentTime}
                   onChange={handleSeek}
-                  className="w-full h-1 bg-gray-700 rounded-full appearance-none cursor-pointer group-hover:h-1.5 transition-all duration-200
+                  className="w-full h-1 bg-transparent rounded-full appearance-none cursor-pointer group-hover:h-1.5 transition-all duration-200
                             [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white
                             [&::-webkit-slider-thumb]:scale-0 group-hover:[&::-webkit-slider-thumb]:scale-100 transition-transform duration-200"
               />
-              <div 
-                className="absolute top-0 left-0 h-1 rounded-full bg-purple-500 pointer-events-none group-hover:h-1.5 transition-all duration-200"
-                style={{ width: `${(currentTime / duration) * 100}%` }}
-              ></div>
             </div>
             <span className="text-xs text-gray-400 w-10 text-left">{new Date(duration * 1000).toISOString().substr(14, 5)}</span>
           </div>

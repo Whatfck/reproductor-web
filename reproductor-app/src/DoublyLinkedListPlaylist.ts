@@ -7,7 +7,7 @@ export interface Song {
     title: string;
     artist: string;
     album: string;
-    year: number;
+    year: number | null;
     duration: string;
     url: string; // URL del objeto Blob para la reproducción,
     picture?: string; // URL de la carátula del álbum (opcional)

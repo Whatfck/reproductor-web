@@ -1,18 +1,29 @@
 import { useState, useMemo, useRef } from 'react';
 import type { Song } from './DoublyLinkedListPlaylist';
 import * as jsmediatags from 'jsmediatags';
-
 // --- Funciones de Ayuda ---
+
+/**
+ * Obtiene la duración real de un archivo de audio.
+ */
+const getAudioDuration = (file: File): Promise<number> => {
+  return new Promise((resolve) => {
+    const audio = document.createElement('audio');
+    audio.src = URL.createObjectURL(file);
+    audio.onloadedmetadata = () => {
+      resolve(audio.duration);
+      URL.revokeObjectURL(audio.src); // Limpiar URL del objeto
+    };
+    audio.onerror = () => resolve(0); // En caso de error, duración 0
+  });
+};
 
 /**
  * Formatea la duración de segundos a un string MM:SS.
  */
-const formatDuration = (tags: any): string => {
-  // La duración puede venir en tags.duration o en tags.audio.duration
-  const durationInSeconds = tags?.duration || tags?.audio?.duration || 0;
-  const secondsValue = typeof durationInSeconds === 'number' ? durationInSeconds : 0;
-
-  if (isNaN(secondsValue)) return '0:00';
+const formatDuration = (durationInSeconds: number): string => {
+  const secondsValue = durationInSeconds || 0;
+  if (isNaN(secondsValue) || secondsValue === 0) return '-:--';
   const minutes = Math.floor(secondsValue / 60);
   const seconds = Math.floor(secondsValue % 60);
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
@@ -36,22 +47,19 @@ const getPictureDataUrl = (picture: any): string | undefined => {
 /**
  * Extrae el año de los metadatos, que puede ser un número o un string (YYYY-MM-DD).
  */
-const getYear = (yearTag: string | number | undefined): number => {
-  const currentYear = new Date().getFullYear();
-  if (!yearTag) return currentYear;
+const getYear = (yearTag: string | number | undefined): number | null => {
+  if (!yearTag) return null;
   const yearString = String(yearTag);
 
   // Intenta extraer el año de formatos como "YYYY-MM-DDTHH:mm:ssZ" o simplemente "YYYY"
-  const yearMatch = yearString.match(/^(?:(\d{4})-\d{2}-\d{2}T.*|(\d{4}))/);
+  const yearMatch = yearString.match(/^(\d{4})/);
   if (yearMatch) {
-    // yearMatch[1] es para "YYYY-MM-DD", yearMatch[2] es para "YYYY"
-    // y el tercero es para manejar cuando el año es solo un número sin formato de string.
-    const yearStr = yearMatch[1] || yearMatch[2] || yearString;
+    const yearStr = yearMatch[1];
     const year = parseInt(yearStr, 10);
-    // Valida que el año sea razonable
-    if (year > 1000 && year <= currentYear) return year;
+    // Valida que el año sea un número razonable, pero permite años futuros.
+    if (year > 1000) return year;
   }
-  return currentYear;
+  return null;
 };
 
 /**
@@ -80,6 +88,7 @@ export function useLibrary() {
     
     const songsWithMetadata: Song[] = await Promise.all(
       audioFiles.map(async (file, index): Promise<Song> => {
+        const duration = await getAudioDuration(file);
         return new Promise((resolve) => {
           jsmediatags.read(file, {
             onSuccess: (tag) => {
@@ -90,18 +99,23 @@ export function useLibrary() {
                 artist: tags.artist || 'Desconocido',
                 album: tags.album || 'Desconocido',
                 year: getYear(tags.year),
-                duration: formatDuration(tags),
+                duration: formatDuration(duration),
                 picture: getPictureDataUrl(tags.picture),
                 url: URL.createObjectURL(file),
               });
             },
             onError: () => {
               // Si falla, usamos los valores por defecto
-              resolve({ id: Date.now() + index, title: file.name.replace(/\.[^/.]+$/, ""), artist: 'Desconocido', album: 'Desconocido', year: new Date().getFullYear(), duration: '0:00', url: URL.createObjectURL(file) });
+              resolve({ id: Date.now() + index, title: file.name.replace(/\.[^/.]+$/, ""), artist: 'Desconocido', album: 'Desconocido', year: null, duration: formatDuration(duration), url: URL.createObjectURL(file) });
             }
           });
         });
       })
+    );
+    
+    // Ordena las canciones alfabéticamente por título antes de guardarlas en el estado.
+    songsWithMetadata.sort((a, b) => 
+      a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })
     );
     setLibrary(songsWithMetadata);
   };
