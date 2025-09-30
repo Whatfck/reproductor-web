@@ -1,73 +1,61 @@
-# React + TypeScript + Vite
+# 🎶 Reproductor-app 🎶 #  
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Debo crear un reproductor de musica, estos son los criterios del profesor:  
 
-Currently, two official plugins are available:
+## ❗TALLER LISTAS DOBLES ##  
+Lista de reproducción de canciones
+Crear una app en Python o Typescript aplicando los conceptos de "listas dobles" que permita simular una lista de reproducción de canciones donde cumpla los siguientes **requerimientos:**  
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Para este taller se debe crear un Front donde el usuario pueda interactuar. Permita agregar una canción (al inicio, al final y en cualquier posición).
+- Permita eliminar una canción de la lista.
+- Permita adelantar canción.
+- Permita retroceder canción.
+- Otras funcionalidades que usted considere pertinente.
 
-## React Compiler
+## 🔔 Funcionalidades pertinente ##  
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Estas son las características que hacen que un reproductor de música sea útil y usable:  
 
-## Expanding the ESLint configuration
+**🎵 Reproducción Básica:**  
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Reproducir, Pausar, Detener.
+- Pista Anterior/Siguiente.
+- Barra de Progreso para saltar a cualquier punto de la canción.
+- Control de Volumen.
+- Gestión de Biblioteca:
+- Escaneo de Carpetas Locales: Capacidad para escanear directorios del sistema para encontrar archivos de música (MP3, FLAC, AAC, OGG, etc.).
+- Visualización por Artista, Álbum y Canción.  
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+**🔎 Búsqueda Rápida: Funcionalidad para buscar canciones, artistas o álbumes dentro de la biblioteca.**
+- Listas de Reproducción (Playlists):
+- Creación, Edición y Guardado de listas de reproducción personalizadas.
+- Importar/Exportar listas (útil para compartir o hacer copias de seguridad, formato .m3u8 y almacenado en la memoria del dispositivo).  
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+**▶️ Opciones de Reproducción:**
+- Modo Aleatorio (Shuffle).
+- Repetir (canción actual o lista completa).  
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+**🔭 Visualización de Información:**
+- Mostrar Metadatos (ID3 Tags): Título de la canción, artista, álbum, año.
+- Visualización de la Carátula del Álbum (Album Art).  
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+**🌑 Funciones Avanzadas:**
+- Soporte para Formatos de Alta Calidad (Lossless): Compatibilidad con formatos como FLAC y ALAC además de los comunes como MP3 y AAC, entre otros.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+**🛠️ Tecnologías Utilizadas**
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Para un desarrollo ágil y moderno, este proyecto fue construido utilizando el siguiente stack:
+- Frontend: React con Vite para una interfaz de usuario dinámica.
+- Estilos: Tailwind CSS para un diseño rápido y responsivo.
+- Backend/Lógica: Node.js
+- Base de Datos: SQLite para el almacenamiento local de metadatos de la biblioteca y listas de reproducción.
+- Asistencia de Codificación: Desarrollado con la ayuda de GitHub Copilot para una mayor productividad.
+
+---
+
+## 🧑‍💻 Autor
+
+Este proyecto fue desarrollado por: ***[@Whatfck](https://github.com/Whatfck)***  
+
+## 📄 Licencia
+Este proyecto está bajo la Licencia [**MIT**](LICENSE).
