@@ -1,12 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import type { Song } from './DoublyLinkedListPlaylist';
+import type { Song } from './useLibrary';
 import type { RepeatMode } from './usePlaylist';
 
-/**
- * Hook personalizado para gestionar la lógica del reproductor de audio HTML5.
- * @param currentSong La canción que se debe reproducir.
- * @param onNext Callback para reproducir la siguiente canción cuando la actual termina.
- */
 export function useAudioPlayer(currentSong: Song | null, onNext: () => void, repeatMode: RepeatMode) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -14,7 +9,6 @@ export function useAudioPlayer(currentSong: Song | null, onNext: () => void, rep
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(1);
 
-  // Efecto para controlar la reproducción cuando cambia la canción actual
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.loop = repeatMode === 'one';
@@ -36,7 +30,6 @@ export function useAudioPlayer(currentSong: Song | null, onNext: () => void, rep
     }
   }, [currentSong, repeatMode]);
 
-  // Alternar entre reproducir y pausar
   const togglePlay = useCallback(() => {
     if (audioRef.current) {
       if (isPlaying) {
@@ -48,14 +41,12 @@ export function useAudioPlayer(currentSong: Song | null, onNext: () => void, rep
     }
   }, [isPlaying]);
 
-  // Manejadores de eventos del elemento <audio>
   const handleTimeUpdate = () => setCurrentTime(audioRef.current?.currentTime || 0);
   const handleLoadedMetadata = () => setDuration(audioRef.current?.duration || 0);
   const handleEnded = useCallback(() => {
     onNext();
   }, [onNext]);
 
-  // Funciones para controlar el reproductor desde la UI
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (audioRef.current) {
       audioRef.current.currentTime = Number(e.target.value);

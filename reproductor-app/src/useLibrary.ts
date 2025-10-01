@@ -1,26 +1,29 @@
 import { useState, useMemo, useRef } from 'react';
-import type { Song } from './DoublyLinkedListPlaylist';
 import * as jsmediatags from 'jsmediatags';
-// --- Funciones de Ayuda ---
 
-/**
- * Obtiene la duración real de un archivo de audio.
- */
+export interface Song {
+    id: number;
+    title: string;
+    artist: string;
+    album: string;
+    year: number | null;
+    duration: string;
+    url: string;
+    picture?: string;
+}
+
 const getAudioDuration = (file: File): Promise<number> => {
   return new Promise((resolve) => {
     const audio = document.createElement('audio');
     audio.src = URL.createObjectURL(file);
     audio.onloadedmetadata = () => {
       resolve(audio.duration);
-      URL.revokeObjectURL(audio.src); // Limpiar URL del objeto
+      URL.revokeObjectURL(audio.src);
     };
-    audio.onerror = () => resolve(0); // En caso de error, duración 0
+    audio.onerror = () => resolve(0);
   });
 };
 
-/**
- * Formatea la duración de segundos a un string MM:SS.
- */
 const formatDuration = (durationInSeconds: number): string => {
   const secondsValue = durationInSeconds || 0;
   if (isNaN(secondsValue) || secondsValue === 0) return '-:--';
@@ -29,9 +32,6 @@ const formatDuration = (durationInSeconds: number): string => {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 };
 
-/**
- * Extrae la carátula del álbum y la convierte a una URL de datos.
- */
 const getPictureDataUrl = (picture: any): string | undefined => {
   if (picture) {
     const { data, format } = picture;
@@ -44,40 +44,24 @@ const getPictureDataUrl = (picture: any): string | undefined => {
   return undefined;
 };
 
-/**
- * Extrae el año de los metadatos, que puede ser un número o un string (YYYY-MM-DD).
- */
 const getYear = (yearTag: string | number | undefined): number | null => {
   if (!yearTag) return null;
   const yearString = String(yearTag);
 
-  // Intenta extraer el año de formatos como "YYYY-MM-DDTHH:mm:ssZ" o simplemente "YYYY"
   const yearMatch = yearString.match(/^(\d{4})/);
   if (yearMatch) {
     const yearStr = yearMatch[1];
     const year = parseInt(yearStr, 10);
-    // Valida que el año sea un número razonable, pero permite años futuros.
     if (year > 1000) return year;
   }
   return null;
 };
 
-/**
- * Hook personalizado para gestionar la biblioteca de música.
- * Encapsula la lógica de carga de archivos, búsqueda y filtrado.
- */
 export function useLibrary() {
-  // Estado para la biblioteca completa de canciones
   const [library, setLibrary] = useState<Song[]>([]);
-  // Estado para la barra de búsqueda
   const [searchTerm, setSearchTerm] = useState('');
-  // Referencia al input de tipo 'file' para poder hacerle click programáticamente
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  /**
-   * Se activa cuando el usuario selecciona una carpeta.
-   * Procesa los archivos y los convierte en una biblioteca de canciones.
-   */
   const handleFolderSelection = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files) return;
@@ -105,7 +89,6 @@ export function useLibrary() {
               });
             },
             onError: () => {
-              // Si falla, usamos los valores por defecto
               resolve({ id: Date.now() + index, title: file.name.replace(/\.[^/.]+$/, ""), artist: 'Desconocido', album: 'Desconocido', year: null, duration: formatDuration(duration), url: URL.createObjectURL(file) });
             }
           });
@@ -113,21 +96,16 @@ export function useLibrary() {
       })
     );
     
-    // Ordena las canciones alfabéticamente por título antes de guardarlas en el estado.
     songsWithMetadata.sort((a, b) => 
       a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })
     );
     setLibrary(songsWithMetadata);
   };
 
-  /**
-   * Simula un click en el input de archivo oculto para abrir el selector de carpetas.
-   */
   const triggerFolderSelector = () => {
     fileInputRef.current?.click();
   };
 
-  // Memoizamos el filtrado para que no se recalcule en cada render
   const filteredLibrary = useMemo(() => {
     if (!searchTerm) return library;
     return library.filter(song =>

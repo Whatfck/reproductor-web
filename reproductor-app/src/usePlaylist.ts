@@ -1,23 +1,13 @@
 import { useState, useCallback } from 'react';
-import type { Song } from './DoublyLinkedListPlaylist';
+import type { Song } from './useLibrary';
 
 export type RepeatMode = 'none' | 'all' | 'one';
 
-/**
- * Hook para gestionar el estado de la reproducción actual.
- * Temporalmente simplificado para enfocarse en la biblioteca.
- */
 export function usePlaylist(library: Song[]) {
-  // Estado para la canción que está sonando
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
-  // Estado para el modo aleatorio
   const [isShuffle, setIsShuffle] = useState(false);
-  // Estado para el modo de repetición
-  const [repeatMode, setRepeatMode] = useState<RepeatMode>('all');
+  const [repeatMode, setRepeatMode] = useState<RepeatMode>('none');
 
-  /**
-   * Pasa a la siguiente canción de la biblioteca.
-   */
   const nextSong = useCallback(() => {
     if (library.length === 0) {
       setCurrentSong(null);
@@ -36,9 +26,9 @@ export function usePlaylist(library: Song[]) {
     if (nextIndex < library.length) {
       setCurrentSong(library[nextIndex]);
     } else if (repeatMode === 'all') {
-      setCurrentSong(library[0]); // Vuelve al inicio
+      setCurrentSong(library[0]);
     } else {
-      setCurrentSong(null); // Se detiene al final
+      setCurrentSong(null);
     }
   }, [currentSong, library, isShuffle, repeatMode]);
   
@@ -56,9 +46,6 @@ export function usePlaylist(library: Song[]) {
     setCurrentSong(library[prevIndex]);
   }, [currentSong, library, isShuffle]);
 
-  /**
-   * Reproduce una canción inmediatamente desde la biblioteca.
-   */
   const playSongNow = useCallback((song: Song) => {
     setCurrentSong(song);
   }, []);
