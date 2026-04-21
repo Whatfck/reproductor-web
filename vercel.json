@@ -1,0 +1,5 @@
+{
+  "installCommand": "cd reproductor-app && npm install",
+  "buildCommand": "cd reproductor-app && npm run build",
+  "outputDirectory": "reproductor-app/dist"
+}
